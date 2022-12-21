@@ -15,13 +15,14 @@ import UserModel from "./models/User.js";
 // подключаемся к БД mongoDb (чтобы зайти на сатй- нужно включать VPN!)
 mongoose
   // в connect указываем логин и пароль, которые задавали в базе на сайте
+  // после mongodb.net/ указываем таблицу blog, чтобы подключиться к ней сразу
   .connect(
-    "mongodb+srv://admin:12345678aA@cluster0.9fb4f2z.mongodb.net/?retryWrites=true&w=majority"
+    "mongodb+srv://admin:12345678aA@cluster0.9fb4f2z.mongodb.net/blog?retryWrites=true&w=majority"
   )
   .then(() => {
-    console.log("DB ok!");
+    console.log("MongoDB ok!");
   })
-  .catch((err) => console.log("DB error", err));
+  .catch((err) => console.log("MongoDB error", err));
 
 // создаем наше express - приложение
 const app = express();
@@ -69,5 +70,5 @@ app.listen(4444, (err) => {
     return console.log(err);
   }
 
-  console.log("Server ok!");
+  console.log("Server NodeJS + Express ok!");
 });
