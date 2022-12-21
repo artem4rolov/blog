@@ -13,6 +13,7 @@ import mongoose from "mongoose";
 
 import { registerValidation } from "./validations/auth.js";
 import UserModel from "./models/User.js";
+import checkAuth from "./utils/checkAuth.js";
 
 // создаем наше express - приложение
 const app = express();
@@ -86,6 +87,7 @@ app.post("/auth/login", async (req, res) => {
 
 // РЕГИСТРАЦИЯ
 // при отправке данных на сервер, валидируем их, и если все ок - продолжаем
+// сразу перед сбором данных с запроса пользователя, прогоняем эти данные через функцию валидации registerValidation на проверку правильности ввода данных пользователем
 app.post("/auth/register", registerValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -148,9 +150,30 @@ app.post("/auth/register", registerValidation, async (req, res) => {
 });
 
 // получаем информацию о пользователе (о себе)
-app.get("/auth/me", (req, res) => {
+// перед отправкой ответа пользователю, валидируем токен пользователя с помощью функции checkAuth
+app.get("/auth/me", checkAuth, async (req, res) => {
   try {
-  } catch (err) {}
+    const user = await UserModel.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Пользователь не найден",
+      });
+    }
+
+    // достаем пароль отдельно от всего остального, чтобы не показывать его при регистрации в БД MongoDB (он бесполезен)
+    const { passwordHash, ...userData } = user._doc;
+
+    // показываем данные о юзере (юерем все кроме пароля), также показываем токен
+    res.json(userData);
+  } catch (err) {
+    // эта ошибка для прогеров
+    console.log(err);
+    // эта ошибка для пользователя
+    res.status(500).json({
+      message: "Нет доступа",
+    });
+  }
 });
 
 // указываем порт, на котором будет запущен сервер (localhost:4444) и вывод ошибки, если не запустится
