@@ -1,3 +1,5 @@
+// библиотека nodemon (в dependencies package.json) автоматически перезапускает сервер при изменении кода в index.js
+
 // библиотека express для работы с сервером на Node.js
 import express from "express";
 // библиотека express-validator для валидации данных, отправляемых пользователем
@@ -12,6 +14,12 @@ import mongoose from "mongoose";
 import { registerValidation } from "./validations/auth.js";
 import UserModel from "./models/User.js";
 
+// создаем наше express - приложение
+const app = express();
+
+// учим сервер читать данные в формате json
+app.use(express.json());
+
 // подключаемся к БД mongoDb (чтобы зайти на сатй- нужно включать VPN!)
 mongoose
   // в connect указываем логин и пароль, которые задавали в базе на сайте
@@ -24,18 +32,59 @@ mongoose
   })
   .catch((err) => console.log("MongoDB error", err));
 
-// создаем наше express - приложение
-const app = express();
-
-// учим сервер читать данные в формате json
-app.use(express.json());
-
-// библиотека nodemon (в dependencies package.json) автоматически перезапускает сервер при изменении кода в index.js
+// АВТОРИЗАЦИЯ
 // при обращении к серверу запросом get (req) он отдает результат (res)
-app.get("/auth/register", (req, res) => {
-  res.send("Иди прогай дальше");
+app.post("/auth/login", async (req, res) => {
+  try {
+    // если emil в базе данных совпадает с тем, что отправил пользователь
+    const user = await UserModel.findOne({ email: req.body.email });
+
+    // если нет совпадений по email в базе MongoDB, то выводим ошибку
+    if (!user) {
+      return res.status(404).json({
+        message: "Пользователь не найден",
+      });
+    }
+
+    // то же самое производим с паролем, сравниваем то что ввел пользователь и то, что есть в базе с помощью bcrypt (потому что пароль зашифрован)
+    const isValidPass = await bcrypt.compare(
+      req.body.passwordHash,
+      user._doc.passwordHash
+    );
+
+    if (!isValidPass) {
+      return res.status(400).json({
+        message: "Неверный логин или пароль",
+      });
+    }
+
+    // создаем новый токен при успешном входе пользователя
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      "secret123",
+      {
+        expiresIn: "30d",
+      }
+    );
+
+    // достаем пароль отдельно от всего остального, чтобы не показывать его при регистрации в БД MongoDB (он бесполезен)
+    const { passwordHash, ...userData } = user._doc;
+
+    // показываем данные о юзере (юерем все кроме пароля), также показываем токен
+    res.json({ ...userData, token });
+  } catch (err) {
+    // эта ошибка для прогеров
+    console.log(err);
+    // эта ошибка для пользователя
+    res.status(500).json({
+      message: "Не удалось авторизоваться!",
+    });
+  }
 });
 
+// РЕГИСТРАЦИЯ
 // при отправке данных на сервер, валидируем их, и если все ок - продолжаем
 app.post("/auth/register", registerValidation, async (req, res) => {
   try {
@@ -96,6 +145,12 @@ app.post("/auth/register", registerValidation, async (req, res) => {
       message: "Не удалось зарегистрироваться!",
     });
   }
+});
+
+// получаем информацию о пользователе (о себе)
+app.get("/auth/me", (req, res) => {
+  try {
+  } catch (err) {}
 });
 
 // указываем порт, на котором будет запущен сервер (localhost:4444) и вывод ошибки, если не запустится
