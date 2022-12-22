@@ -1,8 +1,11 @@
+// создаем middleware
+
 import jwt from "jsonwebtoken";
 
 export default (req, res, next) => {
   // получить данные о пользователе может только авторизованный пользователь
   // соответственно, достаем из запроса, в headers свойство authorization
+  // обрезаем слово Bearer с помощью регулярки, оставляем только наш токен
   const token = (req.headers.authorization || "").replace(/Bearer\s?/, "");
 
   // если токен есть, его нужно расшифровать
