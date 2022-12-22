@@ -1,5 +1,3 @@
-// библиотека express-validator для валидации данных, отправляемых пользователем
-import { validationResult } from "express-validator";
 // библиотека jwt для создания токенов авторизации пользователя
 import jwt from "jsonwebtoken";
 // библиотека bcrypt для шифрования пароля (вообще это для бэка больше, чем для фронта)
@@ -10,12 +8,6 @@ import UserModel from "../models/User.js";
 
 export const register = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      // если наши ошибки есть - возвращаем наш массив ошибок с кодом 400 (ошибка на стороне пользователя)
-      return res.status(400).json(errors.array());
-    }
-
     // получаем пароль пользователя
     const password = req.body.passwordHash;
     // алгоритм шифрования в bcrypt (этот способ шифрования используют многие компании)
