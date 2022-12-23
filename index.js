@@ -1,5 +1,5 @@
 // библиотека nodemon (в dependencies package.json) автоматически перезапускает сервер при изменении кода в index.js
-
+//
 // библиотека express для работы с сервером на Node.js
 import express from "express";
 // библиотека multer для работы с файлами
