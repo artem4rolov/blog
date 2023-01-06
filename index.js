@@ -5,7 +5,7 @@ import express from "express";
 // библиотека multer для работы с файлами
 import multer from "multer";
 // библиотека cors для настройки cors-политики
-// import cors from "cors";
+import cors from "cors";
 // библиотека express-validator для валидации данных, отправляемых пользователем
 import { validationResult } from "express-validator";
 // библиотека jwt для создания токенов авторизации пользователя
@@ -46,7 +46,7 @@ const upload = multer({ storage });
 
 // учим сервер читать данные в формате json
 app.use(express.json());
-// app.use(cors);
+app.use(cors);
 // учим сервер работать с запросами к изображениям - если таковой поступил, проверяем файл, который запросил пользователь в папке uploads
 // get - запрос на получение статичного файла (функция express.static)
 app.use("/uploads", express.static("uploads"));
