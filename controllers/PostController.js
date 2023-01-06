@@ -76,7 +76,7 @@ export const create = async (req, res) => {
       title: req.body.title,
       text: req.body.text,
       imageUrl: req.body.imageUrl,
-      tags: req.body.tags,
+      tags: req.body.tags.split(","),
       // теперь достаем _id пользователя (не из тела (body) запроса)
       user: req.userId,
     });
@@ -172,6 +172,29 @@ export const update = async (req, res) => {
     // эта ошибка для пользователя
     res.status(500).json({
       message: "Не удалось обновить статью",
+    });
+  }
+};
+
+// ПОЛУЧИТЬ ПОСЛЕДНИЕ ТЕГИ
+export const getLastTags = async (req, res) => {
+  try {
+    // find достает все статьи, populate и exec - связывает таблицы, выдает полное значение свойства user
+    const posts = await PostModel.find().limit(5).exec();
+
+    const tags = posts
+      .map((obj) => obj.tags)
+      .flat()
+      .join()
+      .split(", ");
+
+    res.json(tags);
+  } catch (err) {
+    // эта ошибка для прогеров
+    console.log(err);
+    // эта ошибка для пользователя
+    res.status(500).json({
+      message: "Не удалось получить статьи",
     });
   }
 };

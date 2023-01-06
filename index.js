@@ -135,6 +135,9 @@ app.patch(
   PostController.update
 );
 
+// ПОЛУЧЕНИЕ ТЕГОВ
+app.get("/tags", PostController.getLastTags);
+
 // указываем порт, на котором будет запущен сервер (localhost:4444) и вывод ошибки, если не запустится
 app.listen(4444, (err) => {
   if (err) {

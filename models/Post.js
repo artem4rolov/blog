@@ -15,7 +15,7 @@ const PostSchema = new mongoose.Schema(
       required: true,
     },
     tags: {
-      type: String,
+      type: Array,
       // если теги не будут переданы - передаем просто пустой массив
       default: [],
     },
