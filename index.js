@@ -46,7 +46,8 @@ const upload = multer({ storage });
 
 // учим сервер читать данные в формате json
 app.use(express.json());
-app.use(cors);
+// работа с CORS политикой
+app.use(cors());
 // учим сервер работать с запросами к изображениям - если таковой поступил, проверяем файл, который запросил пользователь в папке uploads
 // get - запрос на получение статичного файла (функция express.static)
 app.use("/uploads", express.static("uploads"));
