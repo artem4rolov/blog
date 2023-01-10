@@ -1,5 +1,28 @@
 import PostModel from "../models/Post.js";
 
+// ПОЛУЧИТЬ ПОСЛЕДНИЕ ТЕГИ
+export const getLastTags = async (req, res) => {
+  try {
+    // find достает все статьи, populate и exec - связывает таблицы, выдает полное значение свойства user
+    const posts = await PostModel.find().limit(5).exec();
+
+    const tags = posts
+      .map((obj) => obj.tags)
+      .flat()
+      .join()
+      .split(", ");
+
+    res.json(tags);
+  } catch (err) {
+    // эта ошибка для прогеров
+    console.log(err);
+    // эта ошибка для пользователя
+    res.status(500).json({
+      message: "Не удалось получить теги",
+    });
+  }
+};
+
 // ПОЛУЧИТЬ ВСЕ СТАТЬИ
 export const getAll = async (req, res) => {
   try {
@@ -24,7 +47,7 @@ export const getOne = async (req, res) => {
     const postId = req.params.id;
 
     // поскольку нам нужно не только найти конкретную статью, но и увеличить количество просмотров на +1, используем функцию findOneAndUpdate
-    await PostModel.findOneAndUpdate(
+    PostModel.findOneAndUpdate(
       // сначала получаем id - из переменной выше
       {
         _id: postId,
@@ -57,7 +80,7 @@ export const getOne = async (req, res) => {
         // если все окей - возвращаем документ
         res.json(doc);
       }
-    );
+    ).populate("user");
   } catch (err) {
     // эта ошибка для прогеров
     console.log(err);
@@ -103,7 +126,7 @@ export const remove = async (req, res) => {
     const postId = req.params.id;
 
     // поскольку нам нужно не только найти конкретную статью, но и увеличить количество просмотров на +1, используем функцию findOneAndUpdate
-    await PostModel.findOneAndDelete(
+    PostModel.findOneAndDelete(
       // получаем id - из переменной выше
       {
         _id: postId,
@@ -172,29 +195,6 @@ export const update = async (req, res) => {
     // эта ошибка для пользователя
     res.status(500).json({
       message: "Не удалось обновить статью",
-    });
-  }
-};
-
-// ПОЛУЧИТЬ ПОСЛЕДНИЕ ТЕГИ
-export const getLastTags = async (req, res) => {
-  try {
-    // find достает все статьи, populate и exec - связывает таблицы, выдает полное значение свойства user
-    const posts = await PostModel.find().limit(5).exec();
-
-    const tags = posts
-      .map((obj) => obj.tags)
-      .flat()
-      .join()
-      .split(", ");
-
-    res.json(tags);
-  } catch (err) {
-    // эта ошибка для прогеров
-    console.log(err);
-    // эта ошибка для пользователя
-    res.status(500).json({
-      message: "Не удалось получить статьи",
     });
   }
 };

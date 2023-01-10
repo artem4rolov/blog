@@ -75,7 +75,7 @@ export const login = async (req, res) => {
 
     // то же самое производим с паролем, сравниваем то что ввел пользователь и то, что есть в базе с помощью bcrypt (потому что пароль зашифрован)
     const isValidPass = await bcrypt.compare(
-      req.body.passwordHash,
+      req.body.password,
       user._doc.passwordHash
     );
 
