@@ -9,7 +9,7 @@ import UserModel from "../models/User.js";
 export const register = async (req, res) => {
   try {
     // получаем пароль пользователя
-    const password = req.body.passwordHash;
+    const password = req.body.password;
     // алгоритм шифрования в bcrypt (этот способ шифрования используют многие компании)
     const salt = await bcrypt.genSalt(10);
     // шифруем пароль пользователя
