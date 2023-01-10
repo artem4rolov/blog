@@ -97,7 +97,7 @@ export const create = async (req, res) => {
     // подготавливаем документ на запись в БД MongoDB
     const doc = new PostModel({
       title: req.body.title,
-      text: req.body.text,
+      text: req.body.title,
       imageUrl: req.body.imageUrl,
       tags: req.body.tags.split(","),
       // теперь достаем _id пользователя (не из тела (body) запроса)
@@ -179,7 +179,7 @@ export const update = async (req, res) => {
       {
         title: req.body.title,
         text: req.body.text,
-        tags: req.body.tags,
+        tags: req.body.tags.split(","),
         imageUrl: req.body.imageUrl,
         user: req.userId,
       },
